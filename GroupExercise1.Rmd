@@ -1,0 +1,74 @@
+---
+title: "GroupExercise1"
+output: html_document
+---
+
+```{r}
+library (readr)
+
+url="https://raw.githubusercontent.com/reconjohn/evan_data/master/final_data.csv"
+data<-read_csv(url(url))
+```
+
+```{r}
+names(data)
+```
+
+```{r}
+str(data)
+```
+
+```{r}
+summary(data)
+# View(data)
+# plot(data[,c(3,4,5,7,10)])
+```
+
+```{r}
+# contingency table of counts
+(ContinentEI=table(data$Continent,data$CategoricalEIRank))
+```
+
+```{r}
+# computing marginal percent (per column) from contigency table
+(ContEI_mgCol=prop.table(ContinentEI,
+                            margin = 2))
+```
+
+```{r}
+#making a data frame from contingency table
+
+ContEIDF=as.data.frame(ContinentEI)
+names(ContEIDF)=c("continent","EIrank","counts")
+
+#adding marginal percents:
+ContEIDF$pctCol=as.data.frame(ContEI_mgCol)[,3]
+
+# head of data frame representing contingency table and marginals
+head(ContEIDF)
+str(ContEIDF)
+ord=c("less30","30-60","60-90","90-120","above120")
+ContEIDF$EIrank = factor(ContEIDF$EIrank, levels = ord)
+
+```
+
+```{r}
+# ggplot using data frame
+# basic bar plot DODGED
+
+library(ggplot2)
+base1=ggplot(data=ContEIDF, 
+             aes(x=continent,y=counts,fill=EIrank)) # VARS NEEDED
+
+barDodge= base1 +  geom_bar(stat="identity",
+                            position="dodge") # NOT a default
+
+barDodge= barDodge + geom_text(position = position_dodge(width = 0.9),
+                               angle=90,
+                               hjust=1,
+                               aes(label=counts)) # its own AES!
+barDodge 
+```
+
+
+
